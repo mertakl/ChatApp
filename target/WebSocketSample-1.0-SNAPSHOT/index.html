@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <h:head>
+        <title>Web Sockets Chat</title>
+        <meta name="author" content="javatutorial.net" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <!--	<link type="text/css" rel="stylesheet" href="css/style.css" />-->
+        <style>
+            #messages {
+                width: 300px;
+                height: 200px;
+                border: 1px solid #ccc;
+                pointer-events: none;
+                white-space: pre-wrap;
+            }
+        </style>
+        <script type="text/javascript">
+            var ws;
+            $(document).ready(
+                    function () {
+                        ws = new WebSocket("ws://localhost:8080/WebSocketSample/chat");
+                        ws.onopen = function (event) {
+
+                        }
+                        ws.onmessage = function (event) {
+                            var $textarea = $('#messages');
+                            var json = JSON.parse(event.data);
+                            $textarea.text($textarea.text() + json.username + ": " + json.message + "\n");
+                            $textarea.animate({
+                                scrollTop: $textarea.height()
+                            }, 1000);
+                        }
+                        ws.onclose = function (event) {
+
+                        }
+                    });
+            function sendMessage() {
+                var message = {
+                    "username": $('#username').val(),
+                    "message": $('#message').val()
+                }
+                ws.send(JSON.stringify(message));
+                $('#message').val('');
+            }
+        </script>
+    </h:head>
+    <h:body>
+        <div id="body">
+            <div id="menu">
+                <p class="welcome">
+                    User: <input id="username" value="anonymous" />
+                </p>
+                <div style="clear: both"></div>
+            </div>
+            <div id="chatbox">
+                <div contentEditable="true" id="messages"></div>
+            </div>
+            <form name="message" action="">
+                <input name="usermsg" type="text" id="message" size="63" /> <input
+                    type="button" name="submitmsg" value="Send..."
+                    onclick="sendMessage();" />
+            </form>
+        </div>
+    </h:body>
+</html>
